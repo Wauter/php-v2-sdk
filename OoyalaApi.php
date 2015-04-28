@@ -147,12 +147,14 @@ class OoyalaApi
      * @param string $requestPath The path of the resource from the request.
      * @param array  $queryParams The associative array with GET parameters.
      *                            Defaults to array().
+     * @param array  $assoc       When TRUE, returned objects will be converted into associative arrays.
+     *                            Defaults to FALSE
      * @return string the response body.
      * @throws OoyalaRequestErrorException if an error occurs.
      */
-    public function get($requestPath, $queryParams = array())
+    public function get($requestPath, $queryParams = array(), $assoc = FALSE)
     {
-        return $this->sendRequest('GET', $requestPath, $queryParams);
+        return $this->sendRequest('GET', $requestPath, $queryParams, '', $assoc);
     }
 
     /**
@@ -161,11 +163,13 @@ class OoyalaApi
      * @param array  $requestBody The POST data to send. Defaults to array().
      * @param array  $queryParams The associative array with GET parameters.
      *                            Defaults to array().
+     * @param array  $assoc       When TRUE, returned objects will be converted into associative arrays.
+     *                            Defaults to FALSE
      * @return string the response body.
      * @throws OoyalaRequestErrorException if an error occurs.
      */
     public function post($requestPath, $requestBody = array(),
-        $queryParams = array()
+        $queryParams = array(), $assoc = FALSE
     ) {
         if(empty($requestBody)) {
             $requestBody = json_encode("");
@@ -173,7 +177,7 @@ class OoyalaApi
             $requestBody = json_encode($requestBody);
         }
         return $this->sendRequest('POST', $requestPath, $queryParams,
-            $requestBody);
+            $requestBody, $assoc);
     }
 
     /**
@@ -182,11 +186,13 @@ class OoyalaApi
      * @param array  $requestBody The POST data to send. Defaults to array().
      * @param array  $queryParams The associative array with GET parameters.
      *                            Defaults to array().
+     * @param array  $assoc       When TRUE, returned objects will be converted into associative arrays.
+     *                            Defaults to FALSE
      * @return string the response body.
      * @throws OoyalaRequestErrorException if an error occurs.
      */
     public function put($requestPath, $requestBody = array(),
-        $queryParams = array()
+        $queryParams = array(), $assoc = FALSE
     ) {
         if(empty($requestBody)) {
             $requestBody = json_encode("");
@@ -194,7 +200,7 @@ class OoyalaApi
             $requestBody = json_encode($requestBody);
         }
         return $this->sendRequest('PUT', $requestPath, $queryParams,
-            $requestBody);
+            $requestBody, $assoc);
     }
 
     /**
@@ -203,11 +209,13 @@ class OoyalaApi
      * @param array  $requestBody The POST data to send. Defaults to array().
      * @param array  $queryParams The associative array with GET parameters.
      *                            Defaults to array().
+     * @param array  $assoc       When TRUE, returned objects will be converted into associative arrays.
+     *                            Defaults to FALSE
      * @return string the response body.
      * @throws OoyalaRequestErrorException if an error occurs.
      */
     public function patch($requestPath, $requestBody = array(),
-        $queryParams = array()
+        $queryParams = array(), $assoc = FALSE
     ) {
         if(empty($requestBody)) {
             $requestBody = json_encode("");
@@ -215,7 +223,7 @@ class OoyalaApi
             $requestBody = json_encode($requestBody);
         }
         return $this->sendRequest('PATCH', $requestPath, $queryParams,
-            $requestBody);
+            $requestBody, $assoc);
     }
 
     /**
@@ -224,11 +232,13 @@ class OoyalaApi
      * @param array  $queryParams The associative array with GET parameters.
      *                            Defaults to array().
      * @param string $requestBody The POST data to send. Defaults to "".
+     * @param array  $assoc       When TRUE, returned objects will be converted into associative arrays.
+     *                            Defaults to FALSE
      * @return string the response body.
      * @throws OoyalaRequestErrorException if an error occurs.
      */
-    public function delete($requestPath, $queryParams = array()) {
-        return $this->sendRequest('DELETE', $requestPath, $queryParams);
+    public function delete($requestPath, $queryParams = array(), $assoc = FALSE) {
+        return $this->sendRequest('DELETE', $requestPath, $queryParams, '', $assoc);
     }
 
     /**
@@ -245,6 +255,8 @@ class OoyalaApi
      *                            doing a POST, PATCH or PUT requests. Defaults
      *                            to "".
      *
+     * @param array  $assoc       When TRUE, returned objects will be converted into associative arrays.
+     *                            Defaults to FALSE
      * @return string The signature that shiuld be added as a query parameter to
      *                the URI of the request.
      */
@@ -295,6 +307,8 @@ class OoyalaApi
      * @param string $requestBody The body of the request, used when doing a
      *                            POST, PUT or PATCH request. Defaults to "".
      *
+     * @param array  $assoc       When TRUE, returned objects will be converted into associative arrays.
+     *                            Defaults to FALSE
      * @return array The JSON parsed response if it was success.
      * @throws OoyalaMethodNotSupportedException if the HTTP method is not
      *                                           supported.
@@ -302,7 +316,7 @@ class OoyalaApi
      *                                     request.
      */
     public function sendRequest($httpMethod, $requestPath,
-        $queryParams = array(), $requestBody = ''
+        $queryParams = array(), $requestBody = '', $assoc = FALSE
     ) {
         if(substr($requestPath, 0, 4) != '/v2/')
             $requestPath = '/v2/' . $requestPath;
@@ -318,7 +332,7 @@ class OoyalaApi
 
         $response = $this->httpRequest->execute($httpMethod, $url,
             array('payload' => $requestBody));
-        return json_decode($response['body']);
+        return json_decode($response['body'], $assoc);
     }
 
     private function sanitizeAndAddNeededParams($params)
